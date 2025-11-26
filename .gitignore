@@ -485,3 +485,8 @@ $RECYCLE.BIN/
 
 # IDE files
 .vscode
+
+# databases
+*.sqlite
+*.db
+*.db-*

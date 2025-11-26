@@ -1,6 +1,7 @@
-using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 using tinyutils.Components;
 using tinyutils.Data;
+using tinyutils.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options =>
+    {
+        options.MaximumReceiveMessageSize = 10 * 1024 * 1024;
+    });
+
 builder.Services.AddDbContext<TinyUtilsContext>(options => options.UseSqlite("Data Source=tinyutils.db"));
+builder.Services.AddScoped<JsonFormatterService>();
 
 var app = builder.Build();
 

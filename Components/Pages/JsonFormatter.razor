@@ -1,0 +1,65 @@
+@page "/json-formatter"
+@using tinyutils.Services
+@inject JsonFormatterService JsonService
+
+@rendermode InteractiveServer
+
+<PageTitle>JSON Formatter - tinyutils</PageTitle>
+
+<div class="bg-white rounded-lg shadow-md p-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">JSON Formatter</h1>
+    <p class="text-gray-600 mb-6">Validate and beautify JSON data</p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Input JSON
+            </label>
+            <textarea @bind="inputJson" @bind:event="oninput"
+                class="w-full h-96 p-3 border border-gray-300 rounded-md font-mono text-sm"
+                placeholder='{"name": "example", "value": 123}'></textarea>
+            <button @onclick="FormatJson" disabled="@isProcessing"
+                class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition">
+                @(isProcessing ? "Processing..." : "Format & Validate")
+            </button>
+        </div>
+        <!-- Output Section -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Output
+            </label>
+            @if (result != null)
+                @if (result != null)
+                {
+                    <div
+                        class="mb-4 p-4 rounded-md @(result.IsValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200")">
+                        <p class="font-medium @(result.IsValid ? "text-green-800" : "text-red-800")">
+                            @result.Message
+                        </p>
+                        @if (!result.IsValid &&
+                                        !string.IsNullOrEmpty(result.ErrorMessage))
+                        {
+                            <p class="text-sm text-red-600 mt-2">@result.ErrorMessage</p>
+                        }
+                    </div>
+                    @if (result.IsValid &&
+                                !string.IsNullOrEmpty(result.FormattedJson))
+                    {
+                        <textarea readonly
+                class="w-full h-80 p-3 border border-gray-300 rounded-md font-mono text-sm bg-gray-50">@result.FormattedJson</textarea>
+                    }
+                }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string inputJson = "";
+    private JsonFormatterResult? result;
+    private bool isProcessing = false;
+    private async Task FormatJson()
+    {
+        isProcessing = true;
+        result = await JsonService.FormatJsonAsync(inputJson);
+        isProcessing = false;
+    }
+}
