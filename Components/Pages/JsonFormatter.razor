@@ -1,6 +1,7 @@
 @page "/json-formatter"
 @using tinyutils.Services
 @inject JsonFormatterService JsonService
+@inject AuditService AuditService
 
 @rendermode InteractiveServer
 
@@ -59,7 +60,17 @@
     private async Task FormatJson()
     {
         isProcessing = true;
+        var startTime = DateTime.UtcNow;
         result = await JsonService.FormatJsonAsync(inputJson);
+        var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
+
+        await AuditService.LogUsageAsync(
+            toolName: "JSON Formatter",
+            inputSize: inputJson.Length,
+            outputSize: result.FormattedJson?.Length ?? 0,
+            processingTimeMs: processingTime
+        );
+        
         isProcessing = false;
     }
 }

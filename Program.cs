@@ -12,11 +12,13 @@ builder.Services.AddRazorComponents()
 builder.Services.AddServerSideBlazor()
     .AddHubOptions(options =>
     {
-        options.MaximumReceiveMessageSize = 10 * 1024 * 1024;
+        options.MaximumReceiveMessageSize = 20 * 1024 * 1024;
     });
 
 builder.Services.AddDbContext<TinyUtilsContext>(options => options.UseSqlite("Data Source=tinyutils.db"));
 builder.Services.AddScoped<JsonFormatterService>();
+builder.Services.AddScoped<AuditService>();
+builder.Services.AddScoped<ImageConverterService>();
 
 var app = builder.Build();
 
