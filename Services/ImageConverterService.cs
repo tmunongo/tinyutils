@@ -66,6 +66,52 @@ public class ImageConverterService
 
         return result;
     }
+
+    public async Task<ImageConversionResult> CompressImageAsync(
+        Stream inputStream,
+        int quality = 75)
+    {
+        var result = new ImageConversionResult();
+
+        try
+        {
+            using var image = await Image.LoadAsync(inputStream);
+            using var outputStream = new MemoryStream();
+
+            var format = image.Metadata.DecodedImageFormat;
+
+            if (format?.Name == "PNG")
+            {
+                // PNG doesn't have lossy quality, so convert to WebP for compression
+                await image.SaveAsWebpAsync(outputStream, new WebpEncoder
+                {
+                    Quality = quality
+                });
+                result.ContentType = "image/webp";
+                result.FileExtension = "webp";
+            }
+            else
+            {
+                // Use JPEG for photos
+                await image.SaveAsJpegAsync(outputStream, new JpegEncoder
+                {
+                    Quality = quality
+                });
+                result.ContentType = "image/jpeg";
+                result.FileExtension = "jpg";
+            }
+
+            result.ImageData = outputStream.ToArray();
+            result.Success = true;
+            result.Width = image.Width;
+            result.Height = image.Height;
+        } catch (Exception ex)
+        {
+            result.ErrorMessage = ex.Message;
+        }
+
+        return result;
+    }
 }
 
 public class ImageConversionResult
