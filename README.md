@@ -14,7 +14,7 @@ A few reasons:
 ## Features
 -  **Privacy First**: All processing happens on your server
 - ✅ **JSON Formatter**: Validate and beautify JSON
-- [] **Image Tools**: Convert, compress, and process images
+- [🕐] **Image Tools**: Convert, compress, and process images
 - [] **PDF Tools**: Convert PDFs to images
 - [] **Video Tools**: Create GIFs from video clips
 - [] **Text Utils**: Base64, slugify, UUID, hashing

@@ -40,7 +40,10 @@ public class ImageConverterService
                 case "webp":
                     await image.SaveAsWebpAsync(outputStream, new WebpEncoder
                     {
-                        Quality = 90
+                        // quality 90 made some files bigger :O
+                        Quality = 75,
+                        // try lossy
+                        FileFormat = WebpFileFormatType.Lossy
                     });
                     result.ContentType = "image/webp";
                     result.FileExtension = "webp";
