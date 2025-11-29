@@ -7,48 +7,217 @@
 
 <PageTitle>JSON Formatter - tinyutils</PageTitle>
 
-<div class="bg-white rounded-lg shadow-md p-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">JSON Formatter</h1>
-    <p class="text-gray-600 mb-6">Validate and beautify JSON data</p>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-                Input JSON
-            </label>
-            <textarea @bind="inputJson" @bind:event="oninput"
-                class="w-full h-96 p-3 border border-gray-300 rounded-md font-mono text-sm"
-                placeholder='{"name": "example", "value": 123}'></textarea>
-            <button @onclick="FormatJson" disabled="@isProcessing"
-                class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition">
-                @(isProcessing ? "Processing..." : "Format & Validate")
-            </button>
+<div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl mb-4 transform hover:rotate-3 transition-transform">
+                <!-- Placeholder SVG Icon -->
+                <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+            </div>
+            <h1
+                class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-3">
+                JSON Formatter
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Paste your messy JSON, get it back all pretty. We'll validate it too.
+            </p>
         </div>
-        <!-- Output Section -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-                Output
-            </label>
-            @if (result != null)
-                @if (result != null)
-                {
-                    <div
-                        class="mb-4 p-4 rounded-md @(result.IsValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200")">
-                        <p class="font-medium @(result.IsValid ? "text-green-800" : "text-red-800")">
-                            @result.Message
-                        </p>
-                        @if (!result.IsValid &&
-                                        !string.IsNullOrEmpty(result.ErrorMessage))
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Input Section -->
+            <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                <div class="p-6 sm:p-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <span class="inline-block w-2 h-2 bg-orange-500 rounded-full"></span>
+                            Your messy JSON
+                        </label>
+                        @if (!string.IsNullOrEmpty(inputJson))
                         {
-                            <p class="text-sm text-red-600 mt-2">@result.ErrorMessage</p>
+                            <span class="text-xs text-gray-500 px-3 py-1 bg-gray-100 rounded-full">
+                                @inputJson.Length chars
+                            </span>
                         }
                     </div>
-                    @if (result.IsValid &&
-                                !string.IsNullOrEmpty(result.FormattedJson))
+
+                    <textarea @bind="inputJson" @bind:event="oninput" class="w-full h-96 p-4 border-2 border-gray-200 rounded-2xl font-mono text-sm
+                               focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all
+                               resize-none bg-gradient-to-br from-white to-gray-50" placeholder='Paste your JSON here...
+                        
+For example:
+{"name": "example", "value": 123}'></textarea>
+
+                    <div class="mt-4 flex items-center gap-3">
+                        <button @onclick="FormatJson" disabled="@isProcessing"
+                            class="px-6 py-3 font-bold text-white rounded-xl shadow-md
+                                   transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]
+                                   disabled:transform-none disabled:cursor-not-allowed
+                                   @(isProcessing
+                                                                                                                                                                                   ? "bg-gray-400" 
+                                                                                                                                                                                   : "bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 hover:shadow-lg")">
+                            @if (isProcessing)
+                            {
+                                <span class="inline-flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                    Formatting...
+                                </span>
+                            }
+                            else
+                            {
+                                <span>Format & Validate</span>
+                            }
+                        </button>
+                        <span class="text-xs text-gray-500 hidden sm:block">
+                            Hit that button and watch the magic happen ✨
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                <div class="p-6 sm:p-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                            Pretty output
+                        </label>
+                        @if (result != null && result.IsValid && !string.IsNullOrEmpty(result.FormattedJson))
+                        {
+                            <span class="text-xs text-gray-500 px-3 py-1 bg-gray-100 rounded-full">
+                                @result.FormattedJson.Length chars
+                            </span>
+                        }
+                    </div>
+
+                    @if (result == null)
                     {
-                        <textarea readonly
-                class="w-full h-80 p-3 border border-gray-300 rounded-md font-mono text-sm bg-gray-50">@result.FormattedJson</textarea>
+                        <!-- Empty State -->
+                        <div
+                            class="w-full h-96 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center p-6 bg-gradient-to-br from-gray-50 to-white">
+                            <div
+                                class="w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <p class="text-sm font-medium text-gray-600 mb-2">Your formatted JSON will appear here</p>
+                            <p class="text-xs text-gray-500">Paste some JSON and hit the button to get started</p>
+                        </div>
                     }
-                }
+                    else
+                    {
+                        <!-- Validation Message -->
+                        <div
+                            class="mb-4 p-4 rounded-2xl border-2 @(result.IsValid ? "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200" : "bg-gradient-to-br from-red-50 to-pink-50 border-red-200")">
+                            <div class="flex items-start gap-3">
+                                @if (result.IsValid)
+                                {
+                                    <svg class="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                }
+                                else
+                                {
+                                    <svg class="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                }
+                                <div class="flex-1">
+                                    <p class="font-bold @(result.IsValid ? "text-green-800" : "text-red-800")">
+                                        @result.Message
+                                    </p>
+                                    @if (!result.IsValid && !string.IsNullOrEmpty(result.ErrorMessage))
+                                    {
+                                        <p class="text-sm text-red-700 mt-2 font-mono">@result.ErrorMessage</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Output Textarea -->
+                        @if (result.IsValid && !string.IsNullOrEmpty(result.FormattedJson))
+                        {
+                            <textarea readonly
+                        class="w-full h-80 p-4 border-2 border-green-200 rounded-2xl font-mono text-sm
+                                       bg-gradient-to-br from-green-50 to-emerald-50 resize-none
+                                       focus:outline-none focus:ring-4 focus:ring-green-100">@result.FormattedJson</textarea>
+
+                            <button @onclick="CopyToClipboard"
+                                class="mt-4 px-4 py-2 text-sm font-semibold text-green-700 bg-green-100 rounded-xl
+                                                                               hover:bg-green-200 transition-colors duration-200 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy formatted JSON
+                            </button>
+                        }
+                        else if (!result.IsValid)
+                        {
+                            <!-- Error State -->
+                            <div
+                                class="w-full h-80 border-2 border-red-200 rounded-2xl flex flex-col items-center justify-center text-center p-6 bg-gradient-to-br from-red-50 to-pink-50">
+                                <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-4">
+                                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm font-medium text-red-700 mb-2">Unable to format</p>
+                                <p class="text-xs text-red-600">Check the error message above and try again</p>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Card -->
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl border border-amber-200 overflow-hidden">
+            <div class="p-6 sm:p-8">
+                <div class="flex items-start gap-4">
+                    <div
+                        class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-amber-900 mb-2">Quick tips</h3>
+                        <ul class="text-sm text-amber-800 space-y-1">
+                            <li>• Paste compact JSON — we'll indent it beautifully</li>
+                            <li>• We'll catch syntax errors and tell you what's wrong</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fun Footer Note -->
+        <div class="text-center mt-8 text-sm text-gray-500">
+            <p>No logging, no nonsense. Just good ol' JSON formatting. 🎯</p>
         </div>
     </div>
 </div>
@@ -57,6 +226,7 @@
     private string inputJson = "";
     private JsonFormatterResult? result;
     private bool isProcessing = false;
+
     private async Task FormatJson()
     {
         isProcessing = true;
@@ -65,12 +235,21 @@
         var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
 
         await AuditService.LogUsageAsync(
-            toolName: "JSON Formatter",
-            inputSize: inputJson.Length,
-            outputSize: result.FormattedJson?.Length ?? 0,
-            processingTimeMs: processingTime
+        toolName: "JSON Formatter",
+        inputSize: inputJson.Length,
+        outputSize: result.FormattedJson?.Length ?? 0,
+        processingTimeMs: processingTime
         );
-        
+
         isProcessing = false;
+    }
+
+    private async Task CopyToClipboard()
+    {
+        if (result?.FormattedJson != null)
+        {
+            @* TODO: add copying with JS interop *@
+            await Task.CompletedTask;
+        }
     }
 }

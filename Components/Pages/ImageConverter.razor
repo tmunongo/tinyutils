@@ -8,72 +8,224 @@
 
 <PageTitle>Image Converter - tinyutils</PageTitle>
 
-<div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-auto my-10">
-    <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Image Converter</h1>
-    <p class="text-gray-600 mb-8">Convert images between JPEG, PNG, and WebP formats</p>
-
-    <div class="mb-6 border-b pb-6 border-gray-100">
-        <label class="block text-lg font-semibold text-gray-700 mb-2">
-            Upload Image
-        </label>
-        <InputFile OnChange="HandleFileSelected" accept="image/*"
-            class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-base file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-150 ease-in-out cursor-pointer" />
-    </div>
-
-    @if (uploadedFile != null)
-    {
-        <div class="mb-6 p-4 bg-gray-50 rounded-lg shadow-inner">
-            <p class="text-sm font-medium text-gray-800">
-                <span class="font-bold">File:</span> @uploadedFile.Name (@FormatBytes(uploadedFile.Size))
+<div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl mb-4 transform hover:rotate-3 transition-transform">
+                <!-- Placeholder SVG Icon -->
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </div>
+            <h1
+                class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-3">
+                Image Converter
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Transform your images between formats. JPEG, PNG, WebP; we speak them all.
             </p>
         </div>
 
-        <div class="mb-8">
-            <label class="block text-lg font-semibold text-gray-700 mb-3">
-                Convert to:
-            </label>
-            <select @bind="selectedFormat"
-                class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base">
-                <option value="jpeg">JPEG</option>
-                <option value="png">PNG</option>
-                <option value="webp">WebP</option>
-            </select>
-        </div>
+        <!-- Main Card -->
+        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+            <div class="p-6 sm:p-10">
+                <!-- Upload Section -->
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                        Choose your image
+                    </label>
+                    <div class="relative group">
+                        <InputFile OnChange="HandleFileSelected" accept="image/*" class="relative z-10 block w-full text-sm text-gray-600 cursor-pointer
+                                   file:mr-4 file:py-4 file:px-6 file:rounded-full file:border-0 
+                                   file:text-sm file:font-semibold file:bg-gradient-to-r file:from-blue-50 file:to-cyan-50 
+                                   file:text-blue-700 hover:file:from-blue-100 hover:file:to-cyan-100
+                                   file:transition-all file:duration-200 file:cursor-pointer
+                                   file:shadow-sm hover:file:shadow-md" />
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none">
+                        </div>
+                    </div>
+                </div>
 
-        <button @onclick="ConvertImage" disabled="@isProcessing"
-            class="w-full px-6 py-3 text-lg font-semibold text-white rounded-lg shadow-md transition duration-150 ease-in-out
-                                       @(isProcessing ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800")">
-            @(isProcessing ? "Processing..." : "Convert Image")
-        </button>
-    }
+                @if (uploadedFile != null)
+                {
+                    <!-- File Info Card -->
+                    <div class="mb-8 p-5 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold text-gray-900 truncate">@uploadedFile.Name</p>
+                                <p class="text-xs text-gray-500">@FormatBytes(uploadedFile.Size)</p>
+                            </div>
+                        </div>
+                    </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="mt-6 p-4 bg-red-50 border border-red-300 rounded-lg">
-            <p class="text-red-700 font-medium">Error: @errorMessage</p>
-        </div>
-    }
+                    <!-- Format Selection -->
+                    <div class="mb-8">
+                        <label class="block text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <span class="inline-block w-2 h-2 bg-cyan-500 rounded-full"></span>
+                            Convert to
+                        </label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="relative cursor-pointer group">
+                                <input type="radio" name="format" value="jpeg" @onchange="@(() => selectedFormat = "jpeg")"
+                                    checked="@(selectedFormat == "jpeg")" class="sr-only peer" />
+                                <div class="p-5 bg-white border-2 rounded-2xl transition-all
+                                                   peer-checked:border-blue-500 peer-checked:bg-gradient-to-br peer-checked:from-blue-50 peer-checked:to-cyan-50
+                                                   hover:border-blue-300 hover:shadow-md
+                                                   border-gray-200 text-center">
+                                    <div class="text-2xl mb-2">📸</div>
+                                    <p class="text-sm font-bold text-gray-900">JPEG</p>
+                                    <p class="text-xs text-gray-500 mt-1">Best for photos</p>
+                                </div>
+                            </label>
+                            <label class="relative cursor-pointer group">
+                                <input type="radio" name="format" value="png" @onchange="@(() => selectedFormat = "png")"
+                                    checked="@(selectedFormat == "png")" class="sr-only peer" />
+                                <div class="p-5 bg-white border-2 rounded-2xl transition-all
+                                                   peer-checked:border-blue-500 peer-checked:bg-gradient-to-br peer-checked:from-blue-50 peer-checked:to-cyan-50
+                                                   hover:border-blue-300 hover:shadow-md
+                                                   border-gray-200 text-center">
+                                    <div class="text-2xl mb-2">🎨</div>
+                                    <p class="text-sm font-bold text-gray-900">PNG</p>
+                                    <p class="text-xs text-gray-500 mt-1">Graphics & logos</p>
+                                </div>
+                            </label>
+                            <label class="relative cursor-pointer group">
+                                <input type="radio" name="format" value="webp" @onchange="@(() => selectedFormat = "webp")"
+                                    checked="@(selectedFormat == "webp")" class="sr-only peer" />
+                                <div class="p-5 bg-white border-2 rounded-2xl transition-all
+                                                   peer-checked:border-blue-500 peer-checked:bg-gradient-to-br peer-checked:from-blue-50 peer-checked:to-cyan-50
+                                                   hover:border-blue-300 hover:shadow-md
+                                                   border-gray-200 text-center">
+                                    <div class="text-2xl mb-2">⚡</div>
+                                    <p class="text-sm font-bold text-gray-900">WebP</p>
+                                    <p class="text-xs text-gray-500 mt-1">Modern & fast</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
 
-    @if (convertedImageData != null)
-    {
-        <div class="mt-8 pt-8 border-t border-gray-200">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Conversion Result</h3>
+                    <!-- Convert Button -->
+                    <button @onclick="ConvertImage" disabled="@isProcessing"
+                        class="w-full px-8 py-5 text-lg font-bold text-white rounded-2xl shadow-lg
+                                       transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]
+                                       disabled:transform-none disabled:cursor-not-allowed
+                                       @(isProcessing
+                                                                                   ? "bg-gray-400" 
+                                                                                   : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:shadow-xl")">
+                        @if (isProcessing)
+                        {
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                                    </circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                Converting...
+                            </span>
+                        }
+                        else
+                        {
+                            <span>Convert to @selectedFormat.ToUpper()</span>
+                        }
+                    </button>
+                }
 
-            <div class="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg">
-                <p class="text-green-800 font-medium">
-                    ✓ Converted successfully! (@imageWidth × @imageHeight px)
-                </p>
+                <!-- Error Message -->
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="mt-6 p-5 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <p class="text-red-800 font-medium">@errorMessage</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Results Section -->
+                @if (convertedImageData != null)
+                {
+                    <div class="mt-10 pt-10 border-t-2 border-dashed border-gray-200">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Success! 🎉</h3>
+                            <p class="text-gray-600">Your image has been transformed</p>
+                        </div>
+
+                        <!-- Image Info Card -->
+                        <div
+                            class="mb-6 p-5 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-green-900">Converted to @selectedFormat.ToUpper()
+                                        </p>
+                                        <p class="text-xs text-green-700">@imageWidth × @imageHeight pixels</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="mb-8">
+                            <div class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                                <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                                Preview
+                            </div>
+                            <div class="relative group overflow-hidden rounded-2xl border-2 border-green-200 shadow-lg">
+                                <img src="@convertedImageDataUrl" alt="Converted image preview"
+                                    class="w-full h-auto transition-transform duration-300 group-hover:scale-105" />
+                            </div>
+                        </div>
+
+                        <!-- Download Button -->
+                        <button @onclick="DownloadImage"
+                            class="w-full px-8 py-5 text-lg font-bold text-white rounded-2xl shadow-lg
+                                           bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700
+                                           transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] hover:shadow-xl">
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download @downloadFileName
+                            </span>
+                        </button>
+                    </div>
+                }
             </div>
-
-            <img src="@convertedImageDataUrl" alt="Converted image preview"
-                class="max-w-full h-auto rounded-lg shadow-xl border border-gray-200 mb-6" />
-
-            <button @onclick="DownloadImage"
-                class="w-full px-6 py-3 text-lg font-semibold text-white rounded-lg shadow-md transition duration-150 ease-in-out bg-green-600 hover:bg-green-700 active:bg-green-800">
-                Download @downloadFileName
-            </button>
         </div>
-    }
+
+        <!-- Fun Footer Note -->
+        <div class="text-center mt-8 text-sm text-gray-500">
+            <p>All conversions happen locally. Your images stay yours. 🔒</p>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -87,7 +239,6 @@
     private int imageWidth;
     private int imageHeight;
 
-    // JavaScript interop function to download a file from base64 data
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -107,7 +258,6 @@ document.body.removeChild(link);
 
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        // Limit to only the first file if multiple were selected (InputFile allows single/multiple)
         uploadedFile = e.File;
         convertedImageData = null;
         errorMessage = null;
@@ -124,7 +274,6 @@ document.body.removeChild(link);
         try
         {
             var startTime = DateTime.UtcNow;
-            // 10MB limit
             using var stream = uploadedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
 
             var result = await ImageService.ConvertImageAsync(stream, selectedFormat);
@@ -139,7 +288,6 @@ document.body.removeChild(link);
 
                 var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
 
-                // Log usage (assuming ImageService/AuditService handle necessary dependency injection and implementation)
                 await AuditService.LogUsageAsync(
                 toolName: "Image Converter",
                 inputSize: uploadedFile.Size,
@@ -154,7 +302,6 @@ document.body.removeChild(link);
         }
         catch (Exception ex)
         {
-            // Catch specific size exception if OpenReadStream failed
             errorMessage = $"Error processing file: {ex.Message}";
         }
         finally
@@ -168,7 +315,6 @@ document.body.removeChild(link);
         if (convertedImageData == null || string.IsNullOrEmpty(downloadFileName)) return;
 
         var base64 = Convert.ToBase64String(convertedImageData);
-        // Invoke the JS function defined in OnAfterRenderAsync to trigger the file download
         await JS.InvokeVoidAsync("downloadFile", downloadFileName, base64);
     }
 
