@@ -1,3 +1,5 @@
+[![Build and Release Docker Image](https://github.com/tmunongo/tinyutils/actions/workflows/release.yml/badge.svg)](https://github.com/tmunongo/tinyutils/actions/workflows/release.yml)
+
 # tinyutils
 
 A self-hostable collection of privacy-first web utilities built with ASP.NET Core and Blazor.
