@@ -19,6 +19,7 @@ builder.Services.AddDbContext<TinyUtilsContext>(options => options.UseSqlite("Da
 builder.Services.AddScoped<JsonFormatterService>();
 builder.Services.AddScoped<AuditService>();
 builder.Services.AddScoped<ImageConverterService>();
+builder.Services.AddScoped<TextUtilsService>();
 
 var app = builder.Build();
 
